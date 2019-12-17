@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.MedicineDao">
+	
+    <resultMap type="Medicine" id="medicineResult">
+		<id property="id" column="id"/>
+		<result column="cName" property="cName"/>
+		<result column="eName" property="eName"/>
+		<result column="price" property="price"/>
+		<result column="nums" property="nums"/>
+		<result column="manufacturer" property="manufacturer"/>
+		<result column="describle" property="describle"/>
+		<result column="productDate" property="productDate"/>
+		<result column="safeDate" property="safeDate"/>
+		<result column="standard" property="standard"/>
+		<result column="typeId" property="typeId"/>
+		<result column="oldPrice" property="oldPrice"/>
+		<association property="type" column="typeId" select="com.dao.MedicineTypeDao.findById"></association>
+    </resultMap>
+    
+	<select id="findById" parameterType="Integer" resultType="Medicine" resultMap="medicineResult">
+	    select * from t_medicine where id=#{id}
+	</select>
+
+	<select id="findByTypeId" parameterType="Integer" resultMap="medicineResult">
+	    select * from t_medicine where typeId=#{typeId}
+	</select>
+	
+	<select id="findByCName" parameterType="String" resultMap="medicineResult">
+	    select * from t_medicine where cName = #{cName}
+	</select>
+	
+	<delete id="delete" parameterType="Integer">
+	    delete from t_medicine where id=#{id}
+	</delete>
+
+	<insert id="add" parameterType="MedicineType">
+	    insert into t_medicine values(null,#{cName},#{eName},#{price},#{nums},#{manufacturer},#{describle},#{productDate},#{safeDate},#{standard},#{typeId},#{oldPrice})
+	</insert>
+
+	<select id="list" parameterType="Map" resultMap="medicineResult">
+	    select * from t_medicine 
+	    <where>
+	       	<if test="cName!=null and cName!='' ">
+	            cName like '%${cName}%'
+	        </if>
+	        <if test="typeId!=null and typeId!='' ">
+	            typeId = #{typeId}
+	        </if>
+	    </where>
+	    limit #{start},#{pageSize}
+	</select>
+	
+	<select id="getCount" parameterType="Map" resultType="Integer">
+	    select count(*) from t_medicine 
+	    <where>
+	        <if test="cName!=null and cName!='' ">
+	            cName like '%${cName}%'
+	        </if>
+	        <if test="typeId!=null and typeId!='' ">
+	            typeId = #{typeId}
+	        </if>
+	    </where>
+	</select>
+	
+	<update id="update" parameterType="MedicineType">
+	    update t_medicine
+	    <set>
+	        <if test="cName!=null and cName!='' ">
+	            cName = #{cName},
+	        </if>
+	        <if test="eName!=null and eName!='' ">
+	            eName = #{eName},
+	        </if>
+	        <if test="price!=null and price!='' ">
+	            price = #{price},
+	        </if>
+	        <if test="nums!=null and nums!='' ">
+	            nums = #{nums},
+	        </if>
+	        <if test="manufacturer!=null and manufacturer!='' ">
+	            manufacturer = #{manufacturer},
+	        </if>
+	        <if test="describle!=null and describle!='' ">
+	            describle = #{describle},
+	        </if>
+<!--  	        <if test="productDate!=null and productDate!='' ">
+ 	            productDate = #{productDate},
+	        </if> 
+ -->	        <if test="safeDate!=null and safeDate!='' ">
+	            safeDate = #{safeDate},
+	        </if>
+	        <if test="standard!=null and standard!='' ">
+	            standard = #{standard},
+	        </if>
+	    </set>
+	    where id = #{id}
+	</update>
+</mapper> 

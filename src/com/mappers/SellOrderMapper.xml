@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.SellOrderDao">
+	
+    <resultMap type="SellOrder" id="sellOrderResult">
+		<id property="id" column="id"/>
+		<result column="cName" property="cName"/>
+		<result column="price" property="price"/>
+		<result column="buyNums" property="buyNums"/>
+		<result column="totalMoney" property="totalMoney"/>
+		<result column="createDate" property="createDate"/>
+		<result column="status" property="status"/>
+		<result column="userId" property="userId"/>
+		<result column="oldPrice" property="oldPrice"/>
+		<association property="user" column="userId" select="com.dao.UserDao.findById"></association>
+    </resultMap>
+    
+	<select id="findById" resultType="SellOrder" resultMap="sellOrderResult" parameterType="Integer">
+	    select * from t_sellorder where id=#{id}
+	</select>
+
+	<select id="Nlist" parameterType="Map" resultType="List" resultMap="sellOrderResult">
+ 	    select * from t_sellorder t1,t_user t2 
+ 	    <where>
+ 	        t1.status = 1 and t1.userId = t2.id
+ 	        <if test="cName!=null and cName!='' ">
+ 	            and t1.cName like '%${cName}%'
+ 	        </if>
+ 	    </where>
+ 	    order by createDate desc limit #{start},#{pageSize} 
+	</select>
+	
+	<select id="Ylist" parameterType="Map" resultType="List" resultMap="sellOrderResult">
+ 	    select * from t_sellorder t1,t_user t2 
+ 	    <where>
+ 	        t1.status = 2 and t1.userId = t2.id
+ 	        <if test="cName!=null and cName!='' ">
+ 	            and t1.cName like '%${cName}%'
+ 	        </if>
+ 	    </where>
+ 	    order by createDate desc limit #{start},#{pageSize}
+	</select>
+	
+	<delete id="delete" parameterType="Integer">
+	    delete from t_sellorder where id = #{id}
+	</delete>
+	
+	<insert id="add" parameterType="SellOrder" >
+	    insert into t_sellorder values(null,#{cName},#{price},#{buyNums},#{totalMoney},now(),#{status},#{userId})
+	</insert>
+	
+	<update id="update" parameterType="SellOrder">
+	    update t_sellorder 
+	    <set>
+	        <if test="buyNums!=null and buyNums!='' ">
+	            buyNums = #{buyNums},
+	        </if>
+	        <if test="status!=null and status!='' ">
+	            status = #{status},
+	        </if>
+	    </set>
+	    where id = #{id}
+	</update>
+	
+	<select id="getNCount" resultType="Integer">
+	    select count(*) from t_sellorder t1,t_user t2
+	    <where>
+	        t1.status = 1 and t1.userId = t2.id
+	        <if test="cName!=null and cName!='' ">
+ 	            and t1.cName like '%${cName}%'
+ 	        </if>
+	    </where>
+	</select>
+	
+	<select id="getYCount" resultType="Integer">
+	    select count(*) from t_sellorder t1,t_user t2
+	    <where>
+	        t1.status = 2 and t1.userId = t2.id
+	        <if test="cName!=null and cName!='' ">
+ 	            and t1.cName like '%${cName}%'
+ 	        </if>
+	    </where>
+	</select>
+</mapper> 

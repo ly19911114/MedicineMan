@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.InOrderDao">
+	
+    <resultMap type="InOrder" id="inOrderResult">
+		<id property="id" column="id"/>
+		<result column="cName" property="cName"/>
+		<result column="eName" property="eName"/>
+		<result column="nums" property="nums"/>
+		<result column="price" property="price"/>
+		<result column="createDate" property="createDate"/>
+		<result column="userId" property="userId"/>
+		<result column="status" property="status"/>
+		<association property="user" column="userId" select="com.dao.UserDao.findById"></association>
+		<association property="orderStatus" column="status" select="com.dao.OrderStatusDao.findById"></association>
+    </resultMap>
+    
+	<select id="findById" resultType="OrderStatus" resultMap="inOrderResult" parameterType="Integer">
+	    select * from t_inorder where id=#{id}
+	</select>
+
+	<select id="Nlist" parameterType="Map" resultType="List" resultMap="inOrderResult">
+ 	    select * from t_inorder t1,t_user t2 
+ 	    <where>
+ 	        t1.status = 1 and t1.userId = t2.id
+ 	        <if test="trueName!=null and trueName!='' ">
+ 	            and t2.trueName like '%${trueName}%' 
+ 	        </if>
+ 	    </where>
+ 	    order by createDate desc limit #{start},#{pageSize} 
+	</select>
+	
+	<select id="Ylist" parameterType="Map" resultType="List" resultMap="inOrderResult">
+ 	    select * from t_inorder t1,t_user t2 
+ 	    <where>
+ 	        t1.status = 2 and t1.userId = t2.id
+ 	        <if test="trueName!=null and trueName!='' ">
+ 	            and t2.trueName like '%${trueName}%' 
+ 	        </if>
+ 	    </where>
+ 	    order by createDate desc limit #{start},#{pageSize}
+	</select>
+	
+	<delete id="delete" parameterType="Integer">
+	    delete from t_inorder where id = #{id}
+	</delete>
+	
+	<insert id="add" parameterType="InOrder" >
+	    insert into t_inorder values(null,#{cName},#{eName},#{nums},#{price},now(),#{userId},#{status})
+	</insert>
+	
+	<update id="update" parameterType="InOrder">
+	    update t_inorder 
+	    <set>
+	        <if test="nums!=null and nums!='' ">
+	            nums = #{nums},
+	        </if>
+	        <if test="status!=null and status!='' ">
+	            status = #{status},
+	        </if>
+	    </set>
+	    where id = #{id}
+	</update>
+	
+	<select id="getNCount" resultType="Integer">
+	    select count(*) from t_inorder t1,t_user t2
+	    <where>
+	        t1.status = 1 and t1.userId = t2.id
+	        <if test="trueName!=null and trueName!='' ">
+	            and t2.trueName like '%${trueName}%' 
+	        </if>
+	    </where>
+	</select>
+	
+	<select id="getYCount" resultType="Integer">
+	    select count(*) from t_inorder t1,t_user t2
+	    <where>
+	        t1.status = 2 and t1.userId = t2.id
+	        <if test="trueName!=null and trueName!='' ">
+	            and t2.trueName like '%${trueName}%' 
+	        </if>
+	    </where>
+	</select>
+</mapper> 

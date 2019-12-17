@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.UserDao">
+	
+	<resultMap type="User" id="userResult">
+		<id column="id" property="id"/>
+		<result column="userName" property="userName"/>
+		<result column="passWord" property="passWord"/>
+		<result column="email" property="email"/>
+		<result column="trueName" property="trueName"/>
+		<result column="sex" property="sex"/>
+		<result column="IDCard" property="IDCard"/>
+		<result column="phone" property="phone"/>
+		<result column="address" property="address"/>
+		<association property="identity" column="idenId" select="com.dao.IdentityDao.findById"></association>
+	</resultMap>
+	
+	<select id="login" resultType="User" resultMap="userResult">
+		 select * from t_user t1,t_identity t2 where t1.userName=#{userName} and t1.passWord=#{passWord} and t1.idenId=t2.id
+	</select>
+	
+	<select id="findById" resultType="User" resultMap="userResult" parameterType="Integer">
+		select * from t_user where id=#{id}
+	</select>
+	
+  	<update id="updatePwd" parameterType="User" >
+		update t_user set passWord=#{passWord} where id=#{id}   
+	</update>
+  	
+  	<delete id="delete" parameterType="Integer">
+  	    delete from t_user where id=#{id}
+  	</delete>
+  	
+  	<update id="updateIden" parameterType="Map">
+  	    update t_user
+  	    <set>
+			<if test="identity!=null and identity!='' ">
+			    idenId=#{identity}
+			</if>  	        
+  	    </set>
+  	    where id=#{id}	
+  	</update>
+  	
+  	<select id="findpwd" parameterType="User" resultType="User" resultMap="userResult">
+  	    select * from t_user where email=#{email}
+  	</select>
+  	
+  	<select id="list" resultMap="userResult" parameterType="Map">
+  	    select * from t_user 
+  	    <where>
+  	        <if test="trueName!=null and trueName!='' ">
+  	            trueName like '%${trueName}%'
+  	        </if>
+  	    </where>
+  	    limit #{start},#{pageSize}
+  	</select>
+  	
+  	<insert id="save" parameterType="User">
+  	    insert into t_user values(null,#{userName},#{passWord},#{email},#{trueName},#{sex},#{IDCard},#{phone},#{address},#{idenId})
+  	</insert>
+  	
+  	<update id="update" parameterType="User">
+  	    update t_user
+  	    <set>
+  	        <if test="userName!=null and userName!='' ">
+  	            userName=#{userName},
+  	        </if>
+  	        <if test="passWord!=null and passWord!='' ">
+  	            passWord=#{passWord},
+  	        </if>
+  	        <if test="email!=null and email!='' ">
+  	            email=#{email},
+  	        </if>
+  	        <if test="trueName!=null and trueName!='' ">
+  	            trueName=#{trueName},
+  	        </if>
+  	        <if test="sex!=null and sex!='' ">
+  	            sex=#{sex},
+  	        </if>
+  	        <if test="IDCard!=null and IDCard!='' ">
+  	            IDCard=#{IDCard},
+  	        </if>
+  	        <if test="phone!=null and phone!='' ">
+  	            phone=#{phone},
+  	        </if>
+  	        <if test="address!=null and address!='' ">
+  	            address=#{address},
+  	        </if>
+  	        <if test="idenId!=null and idenId!='' ">
+  	            idenId=#{idenId},
+  	        </if>
+  	    </set>
+  	    where id=#{id}
+  	</update>
+  	
+  	<select id="getCount" parameterType="Map" resultType="Integer">
+	    select count(*) from t_user t1,t_identity t2
+	    <where>
+	        t1.idenId = t2.id
+			<if test="trueName!=null and trueName!='' ">
+				and t1.trueName like '%${trueName}%'
+			</if>
+		</where>
+	</select>
+</mapper> 
